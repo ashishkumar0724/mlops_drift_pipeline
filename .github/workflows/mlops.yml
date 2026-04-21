@@ -13,6 +13,7 @@ on:
 
 env:
   PYTHON_VERSION: '3.10'
+  PYTHONPATH: ${{ github.workspace }}/src  # ✅ Add src to Python path globally
 
 jobs:
   test:
@@ -39,9 +40,12 @@ jobs:
       
       - name: Run basic tests
         run: |
+          # ✅ Set PYTHONPATH for imports to work
+          export PYTHONPATH="${{ github.workspace }}/src:$PYTHONPATH"
           uv run python -c "from pipeline.data import DataManager; print('✅ Data module OK')"
           uv run python -c "from pipeline.train import ModelTrainer; print('✅ Train module OK')"
           uv run python -c "from pipeline.drift import detect_drift; print('✅ Drift module OK')"
+          uv run python -c "from pipeline.retrain import conditional_retrain; print('✅ Retrain module OK')"
 
   pipeline:
     name: 🚀 MLOps Pipeline
@@ -66,7 +70,10 @@ jobs:
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-        run: uv run python src/pipeline/pipeline.py
+          PYTHONPATH: ${{ github.workspace }}/src  # ✅ Ensure src is in path
+        run: |
+          export PYTHONPATH="${{ github.workspace }}/src:$PYTHONPATH"
+          uv run python src/pipeline/pipeline.py
       
       - name: Upload Drift Report
         uses: actions/upload-artifact@v4
