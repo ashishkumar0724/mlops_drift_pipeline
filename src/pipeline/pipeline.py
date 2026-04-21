@@ -3,20 +3,22 @@ Master orchestration pipeline
 Runs: Data → Train → Drift Detect → Conditional Retrain
 Rubric: Automation (25%) + Full Pipeline Flow
 """
-# ✅ ALL IMPORTS AT TOP (before any executable code)
+# ✅ Standard library imports (alphabetical)
 import logging
 import sys
 from pathlib import Path
 
-from pipeline.data import prepare_data_for_pipeline
-from pipeline.drift import detect_drift
-from pipeline.retrain import conditional_retrain
-from pipeline.train import train_churn_model
-
-# ✅ Path setup AFTER imports (fixes E402)
+# ✅ Path setup for local imports
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+# ✅ Local package imports (noqa: E402 because path setup comes first)
+from pipeline.data import prepare_data_for_pipeline  # noqa: E402
+from pipeline.drift import detect_drift  # noqa: E402
+from pipeline.retrain import conditional_retrain  # noqa: E402
+from pipeline.train import train_churn_model  # noqa: E402
+
+# ✅ Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s",
@@ -47,7 +49,10 @@ def run_pipeline(dataset_slug: str = "shilongzhuang/telecom-customer-churn-by-ma
         ref_path = "data/processed/train.parquet"
         cur_path = "data/processed/test_drifted.csv"
         drift_result = detect_drift(
-            reference_path=ref_path, current_path=cur_path, target_column="Churn", threshold=0.05
+            reference_path=ref_path,
+            current_path=cur_path,
+            target_column="Churn",
+            threshold=0.05
         )
 
         # 🔹 STEP 4: Conditional Retraining
@@ -83,7 +88,11 @@ if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser(description="Run end-to-end MLOps pipeline")
-    p.add_argument("--dataset", type=str, default="shilongzhuang/telecom-customer-churn-by-maven-analytics")
+    p.add_argument(
+        "--dataset",
+        type=str,
+        default="shilongzhuang/telecom-customer-churn-by-maven-analytics"
+    )
     args = p.parse_args()
 
     success = run_pipeline(args.dataset)

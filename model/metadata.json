@@ -1,7 +1,7 @@
 {
   "version": "v2",
   "val_accuracy": 1.0,
-  "best_model": "RandomForest",
+  "best_model": "ExtraTrees",
   "current_version": "v2",
   "v1_score": 1.0,
   "v2_score": 1.0,
