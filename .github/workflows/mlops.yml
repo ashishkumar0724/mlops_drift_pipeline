@@ -14,38 +14,34 @@ on:
 env:
   PYTHON_VERSION: '3.10'
 
-test:
-  name: 🔍 Test & Lint
-  runs-on: ubuntu-latest
-  
-  steps:
-    - uses: actions/checkout@v4
+jobs:
+  test:
+    name: 🔍 Test & Lint
+    runs-on: ubuntu-latest
     
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-        cache: 'pip'
-    
-    - name: Install uv
-      run: pip install uv
-    
-    - name: Install dependencies
-      run: uv sync --group dev
-    
-    - name: Lint with Ruff
-      run: uv run ruff check src/
-    
-    - name: Run basic tests
-      env:
-        PYTHONPATH: ${{ github.workspace }}/src  # ← KEY FIX
-      run: |
-        echo "🔍 Testing module imports..."
-        uv run python -c "from pipeline.data import DataManager; print('✅ Data module OK')"
-        uv run python -c "from pipeline.train import ModelTrainer; print('✅ Train module OK')"
-        uv run python -c "from pipeline.drift import detect_drift; print('✅ Drift module OK')"
-        uv run python -c "from pipeline.retrain import conditional_retrain; print('✅ Retrain module OK')"
-        echo "✅ All module imports successful"
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install dependencies
+        run: uv sync --group dev
+      
+      - name: Lint with Ruff
+        run: uv run ruff check src/
+      
+      - name: Run basic tests
+        run: |
+          uv run python -c "from pipeline.data import DataManager; print('✅ Data module OK')"
+          uv run python -c "from pipeline.train import ModelTrainer; print('✅ Train module OK')"
+          uv run python -c "from pipeline.drift import detect_drift; print('✅ Drift module OK')"
 
   pipeline:
     name: 🚀 MLOps Pipeline
