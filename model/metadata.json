@@ -1,0 +1,10 @@
+{
+  "version": "v2",
+  "val_accuracy": 1.0,
+  "best_model": "RandomForest",
+  "current_version": "v2",
+  "v1_score": 1.0,
+  "v2_score": 1.0,
+  "improved": false,
+  "triggered_by_drift_score": 0.4201720170142472
+}

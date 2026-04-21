@@ -1,0 +1,115 @@
+name: MLOps Pipeline CI/CD/CT
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Run daily at 6 AM UTC to check for drift
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    # Manual trigger option
+
+env:
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  test:
+    name: 🔍 Test & Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install dependencies
+        run: uv sync --group dev
+      
+      - name: Lint with Ruff
+        run: uv run ruff check src/
+      
+      - name: Run basic tests
+        run: |
+          uv run python -c "from pipeline.data import DataManager; print('✅ Data module OK')"
+          uv run python -c "from pipeline.train import ModelTrainer; print('✅ Train module OK')"
+          uv run python -c "from pipeline.drift import detect_drift; print('✅ Drift module OK')"
+
+  pipeline:
+    name: 🚀 MLOps Pipeline
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install uv
+        run: pip install uv
+      
+      - name: Install dependencies
+        run: uv sync
+      
+      - name: Run Full MLOps Pipeline
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: uv run python src/pipeline/pipeline.py
+      
+      - name: Upload Drift Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report
+          path: reports/drift_report.html
+          retention-days: 30
+      
+      - name: Upload MLflow Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlruns
+          path: mlruns/
+          retention-days: 30
+      
+      - name: Upload Model
+        uses: actions/upload-artifact@v4
+        with:
+          name: models
+          path: model/predictor_v*
+          retention-days: 30
+      
+      - name: Pipeline Summary
+        run: |
+          echo "## 📊 Pipeline Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Pipeline completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "- Models trained: $(ls model/predictor_v* 2>/dev/null | wc -l)" >> $GITHUB_STEP_SUMMARY
+          echo "- Drift report: reports/drift_report.html" >> $GITHUB_STEP_SUMMARY
+          echo "- MLflow runs: $(ls mlruns/*/ 2>/dev/null | wc -l)" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    name: 🚀 Deploy (Optional)
+    runs-on: ubuntu-latest
+    needs: pipeline
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Render/Cloud Run (Template)
+        run: |
+          echo "📦 Deployment step ready"
+          echo "Configure your cloud provider credentials in GitHub Secrets:"
+          echo "- RENDER_API_KEY (for Render.com)"
+          echo "- GCP_SERVICE_ACCOUNT (for Google Cloud Run)"
+          echo "Then add deployment commands here."
