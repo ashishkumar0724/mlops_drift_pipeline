@@ -17,6 +17,8 @@ dependencies = [
     "scikit-learn>=1.4.0",
     "kaggle>=1.6.0",
     "numpy<2.0",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
 ]
 
 [dependency-groups]
