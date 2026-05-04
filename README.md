@@ -70,36 +70,7 @@
 
 > 🎯 **Rubric-Aligned**: Automation (25%) • Drift Detection (25%) • Retraining Logic (20%) • Versioning (15%) • Innovation (15%)
 
----
 
-> 💡 **Built with**: AutoGluon • Evidently AI • MLflow • FastAPI • Streamlit • GitHub Actions • `uv`
-
-<p align="center">
-  <em>Automating churn prediction with production-grade MLOps — all on free-tier infrastructure.</em>
-</p>
-
----
-
-## ✨ Key Features
-
-<p align="center">
-  <table>
-    <tr>
-      <td align="center"><strong>🔄 CI/CD</strong><br>GitHub Actions</td>
-      <td align="center"><strong>📉 Drift Detection</strong><br>Evidently AI</td>
-      <td align="center"><strong>🔁 Auto-Retraining</strong><br>Smart triggers</td>
-      <td align="center"><strong>🗃️ Versioning</strong><br>MLflow + DVC</td>
-    </tr>
-    <tr>
-      <td align="center"><strong>🚀 Serving</strong><br>FastAPI + Streamlit</td>
-      <td align="center"><strong>🧠 ML Automation</strong><br>AutoGluon</td>
-      <td align="center"><strong>🔐 Secure</strong><br>.env + GitHub Secrets</td>
-      <td align="center"><strong>💸 Free-Tier Ready</strong><br>Render + Streamlit Cloud</td>
-    </tr>
-  </table>
-</p>
-
----
 
 
 
